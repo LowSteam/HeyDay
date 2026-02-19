@@ -20,5 +20,19 @@ services:
       timeout: 5s
       retries: 10
 
+  app:
+    build: .
+    container_name: heyday_app
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      # Connects to the postgres service by its service name (Docker internal DNS)
+      DATABASE_URL: postgresql://heyday:heyday_secret@postgres:5432/heyday_db?schema=public
+      GEMINI_API_KEY: ${GEMINI_API_KEY}
+    depends_on:
+      postgres:
+        condition: service_healthy
+
 volumes:
   postgres_data:
