@@ -1,0 +1,40 @@
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["postgresqlExtensions"]
+}
+
+datasource db {
+  provider   = "postgresql"
+  url        = env("DATABASE_URL")
+  extensions = [vector]
+}
+
+model Restaurant {
+  id          String     @id @default(uuid())
+  name        String
+  slug        String     @unique
+  cuisine     String
+  description String
+  emoji       String
+  color       String
+  menuItems   MenuItem[]
+  createdAt   DateTime   @default(now())
+
+  @@map("restaurants")
+}
+
+model MenuItem {
+  id           String     @id @default(uuid())
+  restaurantId String
+  restaurant   Restaurant @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+  name         String
+  description  String
+  ingredients  String[]
+  price        Decimal    @db.Decimal(6, 2)
+  category     String
+  tags         String[]
+  embedding    Unsupported("vector(3072)")?
+  createdAt    DateTime   @default(now())
+
+  @@map("menu_items")
+}
